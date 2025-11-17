@@ -2,7 +2,10 @@
 
 # Lista só arquivos locais (ignora placeholders offline do Google Drive)
 $files = Get-ChildItem -LiteralPath $path -File -Recurse -Force -ErrorAction SilentlyContinue |
-         Where-Object { -not ($_.Attributes -band [IO.FileAttributes]::Offline) }
+         Where-Object {
+           -not ($_.Attributes -band [IO.FileAttributes]::Offline) -and
+           $_.Name -ne 'desktop.ini'
+         }
 
 # Pré-filtra por tamanho repetido pra evitar hash desnecessário
 $sameSize = $files | Group-Object Length | Where-Object { $_.Count -gt 1 }
@@ -26,3 +29,4 @@ foreach ($grp in $dupes) {
   $grp.Group | Sort-Object FullName | ForEach-Object { $_.FullName }
   ""
 }
+
